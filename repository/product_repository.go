@@ -116,3 +116,4 @@ func (pr *ProductRepository) DeleteProduct(id_product int) error {
 
 	return nil
 }
+

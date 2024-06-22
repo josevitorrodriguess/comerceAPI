@@ -2,10 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/josevitorrodriguess/productsAPI/controller"
 	"github.com/josevitorrodriguess/productsAPI/db"
-	"github.com/josevitorrodriguess/productsAPI/repository"
-	"github.com/josevitorrodriguess/productsAPI/usecase"
+	"github.com/josevitorrodriguess/productsAPI/routes"
 )
 
 func main() {
@@ -17,23 +15,7 @@ func main() {
 		panic(err)
 	}
 
-	ProductRepository :=  repository.NewProductRepository(dbConnection)
-	ProductUseCase := usecase.NewProductUseCase(ProductRepository)
-	ProductController := controller.NewProductControlller(ProductUseCase)
-	
-	server.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(200,gin.H{
-			"message": "pong",
-		})
-	})
+	routes.ProductRoutes(server, dbConnection)
 
-	
-	server.GET("/products", ProductController.GetProducts)
-	server.POST("/product", ProductController.CreateProduct)
-	server.GET("/product/:productId", ProductController.GetProductById)
-	server.DELETE("/product/delete/:productId", ProductController.DeleteProduct)
-
-	
-	
 	server.Run(":8000")
 }
