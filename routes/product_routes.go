@@ -11,7 +11,6 @@ import (
 
 func ProductRoutes(server *gin.Engine, dbConnection *sql.DB) {
 
-
 	ProductRepository := repository.NewProductRepository(dbConnection)
 	ProductUseCase := usecase.NewProductUseCase(ProductRepository)
 	ProductController := controller.NewProductControlller(ProductUseCase)
