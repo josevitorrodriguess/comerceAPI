@@ -4,22 +4,20 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
-	host     = "go_db"
-	port     = 5432
-	user     = "postgres"
+	host     = "localhost"
+	port     = 3306
+	user     = "root"
 	password = "12345"
-	dbname   = "postgres"
+	dbname   = "comerce"
 )
 
 func ConnectDB() (*sql.DB, error) {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, host, port, dbname)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		panic(err)
 	}
@@ -29,7 +27,7 @@ func ConnectDB() (*sql.DB, error) {
 		panic(err)
 	}
 
-	fmt.Println("Connected to " + dbname)
+	fmt.Println("Connected to MySQL database:", dbname)
 
 	return db, nil
 }

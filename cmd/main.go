@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
 
 	dbConnection, err := db.ConnectDB()
@@ -17,9 +18,7 @@ func main() {
 	}
 
 	ProductRepository :=  repository.NewProductRepository(dbConnection)
-
 	ProductUseCase := usecase.NewProductUseCase(ProductRepository)
-	
 	ProductController := controller.NewProductControlller(ProductUseCase)
 	
 	server.GET("/ping", func(ctx *gin.Context) {
@@ -28,9 +27,12 @@ func main() {
 		})
 	})
 
+	
 	server.GET("/products", ProductController.GetProducts)
 	server.POST("/product",ProductController.CreateProduct)
 	server.GET("/product/:productId", ProductController.GetProductById)
 
+	
+	
 	server.Run(":8000")
 }

@@ -1,101 +1,96 @@
 package repository
 
 import (
-	"database/sql"
-	"fmt"
+    "database/sql"
+    "fmt"
 
-	"github.com/josevitorrodriguess/productsAPI/model"
+    "github.com/josevitorrodriguess/productsAPI/model"
 )
 
 type ProductRepository struct {
-	connection *sql.DB
+    connection *sql.DB
 }
 
 func NewProductRepository(conn *sql.DB) ProductRepository {
-	return ProductRepository{
-		connection: conn,
-	}
+    return ProductRepository{
+        connection: conn,
+    }
 }
-
 
 func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
+    query := "SELECT id, product_name, price FROM product"
+    rows, err := pr.connection.Query(query)
+    if err != nil {
+        fmt.Println(err)
+        return nil, err
+    }
 
-	query := "SELECT id, product_name, price FROM product"
-	rows, err := pr.connection.Query(query)
-	if err != nil {
-		fmt.Println(err)
-		return []model.Product{}, err
-	}
-	
-	var productList []model.Product
-	var productObj model.Product
+    defer rows.Close()
 
-	for rows.Next() {
-		err = rows.Scan(
-			&productObj.ID,
-			&productObj.Name,
-			&productObj.Price,
-		)
-		if err != nil {
-			fmt.Println(err)
-			return []model.Product{}, err
-		}
+    var productList []model.Product
 
-		productList = append(productList, productObj)
-	}
+    for rows.Next() {
+        var productObj model.Product
+        err := rows.Scan(
+            &productObj.ID,
+            &productObj.Name,
+            &productObj.Price,
+        )
+        if err != nil {
+            fmt.Println(err)
+            return nil, err
+        }
 
-	rows.Close()
+        productList = append(productList, productObj)
+    }
 
-	return productList, nil
+    return productList, nil
 }
 
+func (pr *ProductRepository) CreateProduct(product model.Product) (int, error) {
+    var id int64
 
-func (pr *ProductRepository) CreateProduct(product model.Product) (int,error) {
-	var id int
-	
-	query, err := pr.connection.Prepare("INSERT INTO product " + 
-	 "(product_name, price)" +
-	 " VALUES ($1, $2) RETURNING id")
+    query, err := pr.connection.Prepare("INSERT INTO product (product_name, price) VALUES (?, ?)")
+    if err != nil {
+        fmt.Println(err)
+        return 0, err
+    }
 
-	 if err != nil {
-		fmt.Println(err)
-		return 0,err
-	 }
+    defer query.Close()
 
-	 err = query.QueryRow(product.Name, product.Price).Scan(&id)
-	 if err != nil {
-		fmt.Println(err)
-		return 0,err
-	 }
+    result, err := query.Exec(product.Name, product.Price)
+    if err != nil {
+        fmt.Println(err)
+        return 0, err
+    }
 
-	 query.Close()
-	 return id, nil
+    id, err = result.LastInsertId()
+    if err != nil {
+        fmt.Println(err)
+        return 0, err
+    }
+
+    return int(id), nil
 }
 
 func (pr *ProductRepository) GetProductById(id_product int) (*model.Product, error) {
-	
-	query, err := pr.connection.Prepare("SELECT * FROM product WHERE id = $1")
-	if err != nil {
-		fmt.Println(err)
-		return nil,err
-	}
+    query := "SELECT id, product_name, price FROM product WHERE id = ?"
+    row := pr.connection.QueryRow(query, id_product)
 
-	var product model.Product
+    var product model.Product
+    err := row.Scan(
+        &product.ID,
+        &product.Name,
+        &product.Price,
+    )
 
-	err = query.QueryRow(id_product).Scan(
-		&product.ID,
-		&product.Name,
-		&product.Price,
-	)
-	
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, nil 
+        }
+        fmt.Println(err)
+        return nil, err
+    }
 
-		return nil, err
-	}
-
-	query.Close()
-	return &product, nil
+    return &product, nil
 }
