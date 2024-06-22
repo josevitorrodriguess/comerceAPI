@@ -53,7 +53,7 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 	id := ctx.Param("productId")
 	if id == "" {
 		response := model.Response{
-			Message: "Id product don't can are null",
+			Message: "Product ID cannote be null",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
 		return
@@ -83,4 +83,37 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, product)
+}
+
+func (p *productController) DeleteProduct(ctx *gin.Context) {
+	
+	id := ctx.Param("productId")
+	if id == "" {
+		response := model.Response{
+			Message: "Product ID cannote be null",
+		}
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	productId, err := strconv.Atoi(id)
+	if err != nil {
+		response := model.Response{
+			Message: "product Id must be a number",
+		}
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err = p.productUseCase.DeleteProduct(productId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	response := model.Response{
+		Message:  "Product successfully deleted",
+	}
+
+	ctx.JSON(http.StatusOK, response)
 }
