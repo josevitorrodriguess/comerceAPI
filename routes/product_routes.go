@@ -5,15 +5,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/josevitorrodriguess/productsAPI/controller"
+	"github.com/josevitorrodriguess/productsAPI/controller/middlewares"
 	"github.com/josevitorrodriguess/productsAPI/repository"
 	"github.com/josevitorrodriguess/productsAPI/usecase"
 )
 
 func ProductRoutes(server *gin.Engine, dbConnection *sql.DB) {
-
-	ProductRepository := repository.NewProductRepository(dbConnection)
-	ProductUseCase := usecase.NewProductUseCase(ProductRepository)
-	ProductController := controller.NewProductControlller(ProductUseCase)
+	productRepository := repository.NewProductRepository(dbConnection)
+	productUseCase := usecase.NewProductUseCase(productRepository)
+	productController := controller.NewProductController(productUseCase)
 
 	server.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
@@ -21,9 +21,13 @@ func ProductRoutes(server *gin.Engine, dbConnection *sql.DB) {
 		})
 	})
 
-	server.GET("/products", ProductController.GetProducts)
-	server.POST("/product", ProductController.CreateProduct)
-	server.GET("/product/:productId", ProductController.GetProductById)
-	server.DELETE("/product/delete/:productId", ProductController.DeleteProduct)
+	server.GET("/products", productController.GetProducts)
+	server.GET("/product/:productId", productController.GetProductById)
+	server.DELETE("/product/delete/:productId", productController.DeleteProduct)
 
+	// Grupo de rotas que necessitam de autenticação
+	authProductRoutes := server.Group("/products", middlewares.Auth())
+	{
+		authProductRoutes.POST("/", productController.CreateProduct)
+	}
 }

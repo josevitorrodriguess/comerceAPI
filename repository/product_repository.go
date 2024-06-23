@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 
-
 	"github.com/josevitorrodriguess/productsAPI/model"
 )
 
@@ -49,33 +48,23 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 }
 
 func (pr *ProductRepository) CreateProduct(product model.Product) (int, error) {
-	var id int64
+    query := "INSERT INTO product (product_name, price, description, merchant_id) VALUES (?, ?, ?, ?)"
+    result, err := pr.connection.Exec(query, product.Name, product.Price, product.Description, product.MerchantID)
+    if err != nil {
+        return 0, err
+    }
 
-	query, err := pr.connection.Prepare("INSERT INTO product (product_name, price) VALUES (?, ?)")
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
-	}
+    id, err := result.LastInsertId()
+    if err != nil {
+        return 0, err
+    }
 
-	defer query.Close()
-
-	result, err := query.Exec(product.Name, product.Price)
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
-	}
-
-	id, err = result.LastInsertId()
-	if err != nil {
-		fmt.Println(err)
-		return 0, err
-	}
-
-	return int(id), nil
+    return int(id), nil
 }
 
+
 func (pr *ProductRepository) GetProductById(id_product int) (*model.Product, error) {
-	query := "SELECT id, product_name, price FROM product WHERE id = ?"
+	query := "SELECT id, product_name, price, description, merchant_id FROM product WHERE id = ?"
 	row := pr.connection.QueryRow(query, id_product)
 
 	var product model.Product
@@ -83,6 +72,8 @@ func (pr *ProductRepository) GetProductById(id_product int) (*model.Product, err
 		&product.ID,
 		&product.Name,
 		&product.Price,
+		&product.Description,
+		&product.MerchantID,
 	)
 
 	if err != nil {
@@ -95,6 +86,8 @@ func (pr *ProductRepository) GetProductById(id_product int) (*model.Product, err
 
 	return &product, nil
 }
+
+
 
 func (pr *ProductRepository) DeleteProduct(id_product int) error {
 
@@ -116,4 +109,3 @@ func (pr *ProductRepository) DeleteProduct(id_product int) error {
 
 	return nil
 }
-

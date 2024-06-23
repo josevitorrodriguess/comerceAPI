@@ -25,3 +25,4 @@ func MerchantRoutes(server *gin.Engine, dbConnection *sql.DB) {
 	server.DELETE("/merchant/delete/:merchantId", MerchantController.DeleteMerchant)
 	server.POST("/login", authController.Login)
 }
+
