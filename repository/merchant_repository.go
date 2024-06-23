@@ -2,9 +2,11 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/josevitorrodriguess/productsAPI/model"
+	"github.com/josevitorrodriguess/productsAPI/services"
 )
 
 type MerchantRepository struct {
@@ -81,7 +83,7 @@ func (mr *MerchantRepository) CreateMerchant(merchant model.Merchant) (int, erro
 
 	defer query.Close()
 
-	result, err := query.Exec(merchant.Name, merchant.TypeProduct, merchant.Email, merchant.Password)
+	result, err := query.Exec(merchant.Name, merchant.TypeProduct, merchant.Email, services.SHA256Encoder(merchant.Password))
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
@@ -116,4 +118,27 @@ func (mr *MerchantRepository) DeleteMerchant(id_merchant int) error {
 
 	return nil
 }
+
+func (mr *MerchantRepository) FindByEmail(email string) (*model.Merchant, error) {
+    var merchant model.Merchant
+
+    query := "SELECT id_merchant, name, product_type, email, password FROM merchant WHERE email = ?"
+    err := mr.connection.QueryRow(query, email).Scan(
+        &merchant.ID,
+        &merchant.Name,
+        &merchant.TypeProduct,
+        &merchant.Email,
+        &merchant.Password,
+    )
+    if err != nil {
+        if errors.Is(err, sql.ErrNoRows) {
+            return nil, nil // Nenhum comerciante encontrado com o e-mail fornecido
+        }
+        fmt.Println(err)
+        return nil, err
+    }
+
+    return &merchant, nil
+}
+
 
