@@ -3,6 +3,7 @@ package usecase
 import (
 	"github.com/josevitorrodriguess/productsAPI/model"
 	"github.com/josevitorrodriguess/productsAPI/repository"
+	"github.com/josevitorrodriguess/productsAPI/services"
 )
 
 type MerchantUsecase struct {
@@ -35,6 +36,7 @@ func (mu *MerchantUsecase) CreateMerchant(merchant model.Merchant) (model.Mercha
 		return model.Merchant{}, err
 	}
 
+	merchant.Password = services.SHA256Encoder(merchant.Password)
 	merchant.ID = merchantId
 
 	return merchant, nil

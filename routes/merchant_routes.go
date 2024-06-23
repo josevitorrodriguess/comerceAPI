@@ -17,6 +17,6 @@ func MerchantRoutes(server *gin.Engine, dbConnection *sql.DB) {
 
 	server.GET("/merchants", MerchantController.GetMerchants)
 	server.GET("/merchant/:merchantId", MerchantController.GetMerchantByID)
-	server.POST("/merchant/", MerchantController.CreateMerchant)
+	server.POST("/merchant", MerchantController.CreateMerchant)
 	server.DELETE("/merchant/delete/:merchantId", MerchantController.DeleteMerchant)
 }

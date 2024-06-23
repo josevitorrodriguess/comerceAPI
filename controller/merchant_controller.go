@@ -85,7 +85,7 @@ func (m *merchantController) CreateMerchant(ctx *gin.Context) {
 }
 
 func (m *merchantController) DeleteMerchant(ctx *gin.Context) {
-	
+
 	id := ctx.Param("merchantId")
 	if id == "" {
 		response := model.Response{
@@ -111,7 +111,7 @@ func (m *merchantController) DeleteMerchant(ctx *gin.Context) {
 	}
 
 	response := model.Response{
-		Message:  "merchant successfully deleted",
+		Message: "merchant successfully deleted",
 	}
 
 	ctx.JSON(http.StatusOK, response)
