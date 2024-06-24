@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"fmt"
+
 	"github.com/josevitorrodriguess/productsAPI/model"
 	"github.com/josevitorrodriguess/productsAPI/repository"
 	"github.com/josevitorrodriguess/productsAPI/services"
@@ -17,19 +19,28 @@ func NewMerchantUsecase(repo repository.MerchantRepository) MerchantUsecase {
 }
 
 func (mu *MerchantUsecase) GetMerchants() ([]model.Merchant, error) {
-	return mu.repository.GetMerchants()
+    return mu.repository.GetMerchants()
 }
+
 
 func (mu *MerchantUsecase) GetMerchantById(id_merchant int) (*model.Merchant, error) {
 	merchant, err := mu.repository.GetMerchantByID(id_merchant)
 	if err != nil {
-		return  nil, err
+		return nil, err
 	}
 
 	return merchant, nil
 }
 
 func (mu *MerchantUsecase) CreateMerchant(merchant model.Merchant) (model.Merchant, error) {
+
+	isValidEmail, err := services.ValidateEmail(merchant.Email)
+	if err != nil {
+		return model.Merchant{}, fmt.Errorf("failed to validate email: %v", err)
+	}
+	if !isValidEmail {
+		return model.Merchant{}, fmt.Errorf("invalid email format: %s", merchant.Email)
+	}
 
 	merchantId, err := mu.repository.CreateMerchant(merchant)
 	if err != nil {
@@ -43,5 +54,5 @@ func (mu *MerchantUsecase) CreateMerchant(merchant model.Merchant) (model.Mercha
 }
 
 func (mu *MerchantUsecase) DeleteMerchant(id_merchant int) error {
-	return  mu.repository.DeleteMerchant(id_merchant)
+	return mu.repository.DeleteMerchant(id_merchant)
 }

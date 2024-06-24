@@ -65,23 +65,22 @@ func (c *clientController) GetClientByID(ctx *gin.Context) {
 }
 
 func (c *clientController) CreateClient(ctx *gin.Context) {
-
 	var client model.Client
 	err := ctx.BindJSON(&client)
-
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	insertedClient, err := c.clientUsecase.CreateClient(client)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, insertedClient)
 }
+
 
 
 func (c *clientController) DeleteClient(ctx *gin.Context) {

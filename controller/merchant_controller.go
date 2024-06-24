@@ -20,14 +20,15 @@ func NewMerchantController(usecase usecase.MerchantUsecase) merchantController {
 }
 
 func (m *merchantController) GetMerchants(ctx *gin.Context) {
+    merchants, err := m.merchantUsecase.GetMerchants()
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
 
-	merchants, err := m.merchantUsecase.GetMerchants()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-	}
-
-	ctx.JSON(http.StatusOK, merchants)
+    ctx.JSON(http.StatusOK, merchants)
 }
+
 
 func (m *merchantController) GetMerchantByID(ctx *gin.Context) {
 
@@ -69,15 +70,14 @@ func (m *merchantController) CreateMerchant(ctx *gin.Context) {
 
 	var merchant model.Merchant
 	err := ctx.BindJSON(&merchant)
-
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
 		return
 	}
 
 	insertMerchant, err := m.merchantUsecase.CreateMerchant(merchant)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

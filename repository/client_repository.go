@@ -77,22 +77,18 @@ func (cr *ClientRepository) CreateClient(client model.Client) (int, error) {
 
 	query, err := cr.connection.Prepare("INSERT INTO client (name, cpf, email, password) VALUES (?, ?, ?, ?)")
 	if err != nil {
-		fmt.Println(err)
-		return 0, err
+		return 0, fmt.Errorf("failed to prepare query: %v", err)
 	}
-
 	defer query.Close()
 
 	result, err := query.Exec(client.Name, client.CPF, client.Email, services.SHA256Encoder(client.Password))
 	if err != nil {
-		fmt.Println(err)
-		return 0, err
+		return 0, fmt.Errorf("failed to execute query: %v", err)
 	}
 
 	id, err = result.LastInsertId()
 	if err != nil {
-		fmt.Println(err)
-		return 0, err
+		return 0, fmt.Errorf("failed to get last insert ID: %v", err)
 	}
 
 	return int(id), nil

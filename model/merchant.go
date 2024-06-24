@@ -6,5 +6,5 @@ type Merchant struct {
 	TypeProduct string `json:"product_type"`
 	Email       string  `json:"email"`
 	Password    string  `json:"password"`
-	Products []Product  `json:products`
+	Products []string  `json:products`
 }
