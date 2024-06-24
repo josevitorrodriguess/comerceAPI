@@ -18,7 +18,7 @@ func NewProductRepository(conn *sql.DB) ProductRepository {
 }
 
 func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
-	query := "SELECT id, product_name, price FROM product"
+	query := "SELECT id, product_name, price, description, merchant_id FROM product"
 	rows, err := pr.connection.Query(query)
 	if err != nil {
 		fmt.Println(err)
@@ -35,6 +35,8 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 			&productObj.ID,
 			&productObj.Name,
 			&productObj.Price,
+			&productObj.Description,
+			&productObj.MerchantID,
 		)
 		if err != nil {
 			fmt.Println(err)
@@ -48,20 +50,19 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 }
 
 func (pr *ProductRepository) CreateProduct(product model.Product) (int, error) {
-    query := "INSERT INTO product (product_name, price, description, merchant_id) VALUES (?, ?, ?, ?)"
-    result, err := pr.connection.Exec(query, product.Name, product.Price, product.Description, product.MerchantID)
-    if err != nil {
-        return 0, err
-    }
+	query := "INSERT INTO product (product_name, price, description, merchant_id) VALUES (?, ?, ?, ?)"
+	result, err := pr.connection.Exec(query, product.Name, product.Price, product.Description, product.MerchantID)
+	if err != nil {
+		return 0, err
+	}
 
-    id, err := result.LastInsertId()
-    if err != nil {
-        return 0, err
-    }
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
 
-    return int(id), nil
+	return int(id), nil
 }
-
 
 func (pr *ProductRepository) GetProductById(id_product int) (*model.Product, error) {
 	query := "SELECT id, product_name, price, description, merchant_id FROM product WHERE id = ?"
@@ -86,8 +87,6 @@ func (pr *ProductRepository) GetProductById(id_product int) (*model.Product, err
 
 	return &product, nil
 }
-
-
 
 func (pr *ProductRepository) DeleteProduct(id_product int) error {
 

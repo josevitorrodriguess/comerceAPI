@@ -7,34 +7,66 @@ import (
 	"github.com/josevitorrodriguess/productsAPI/services"
 )
 
-type AuthUSeCase struct {
+type AuthMerchantUseCase struct {
 	merchantRepo repository.MerchantRepository
 }
 
-func NewAuthUsecase(merchantRepo repository.MerchantRepository) AuthUSeCase {
-	return AuthUSeCase{merchantRepo}
+func NewAuthMerchantUsecase(merchantRepo repository.MerchantRepository) AuthMerchantUseCase {
+	return AuthMerchantUseCase{merchantRepo}
 }
 
-func (au *AuthUSeCase) Login(email, password string) (string, error) {
-    merchant, err := au.merchantRepo.FindByEmail(email)
-    if err != nil {
-        return "", err
-    }
+func (au *AuthMerchantUseCase) Login(email, password string) (string, error) {
+	merchant, err := au.merchantRepo.FindByEmail(email)
+	if err != nil {
+		return "", err
+	}
 
-    if merchant == nil {
-        return "", errors.New("cannot find merchant")
-    }
+	if merchant == nil {
+		return "", errors.New("cannot find merchant")
+	}
 
-    hashedPassword := services.SHA256Encoder(password)
+	hashedPassword := services.SHA256Encoder(password)
 
-    if merchant.Password != hashedPassword {
-        return "", errors.New("invalid credentials")
-    }
+	if merchant.Password != hashedPassword {
+		return "", errors.New("invalid credentials")
+	}
 
-    token, err := services.NewJWTService().GenerateToken(merchant.ID)
-    if err != nil {
-        return "", err
-    }
+	token, err := services.NewJWTService().GenerateToken(merchant.ID)
+	if err != nil {
+		return "", err
+	}
 
-    return token, nil
+	return token, nil
+}
+
+type AuthClientUsecase struct {
+	clientRepo repository.ClientRepository
+}
+
+func NewAuthClientUsecase(clientRepo repository.ClientRepository) AuthClientUsecase {
+	return AuthClientUsecase{clientRepo}
+}
+
+func (au *AuthClientUsecase) LoginClient(email, password string) (string, error) {
+	client, err := au.clientRepo.FindByEmail(email)
+	if err != nil {
+		return "", err
+	}
+
+	if client == nil {
+		return "", errors.New("cannot find merchant")
+	}
+
+	hashedPassword := services.SHA256Encoder(password)
+
+	if client.Password != hashedPassword {
+		return "", errors.New("invalid credentials")
+	}
+
+	token, err := services.NewJWTService().GenerateToken(client.ID)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

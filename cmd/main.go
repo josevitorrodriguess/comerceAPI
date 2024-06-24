@@ -17,6 +17,8 @@ func main() {
 
 	routes.ProductRoutes(server, dbConnection)
 	routes.MerchantRoutes(server,dbConnection)
+	routes.ClientRoutes(server, dbConnection)
+	routes.LoginRoutes(server,dbConnection)
 
 	server.Run(":8000")
 }

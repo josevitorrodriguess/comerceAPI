@@ -15,14 +15,9 @@ func MerchantRoutes(server *gin.Engine, dbConnection *sql.DB) {
 	MerchantUseCase := usecase.NewMerchantUsecase(MerchantRepository)
 	MerchantController := controller.NewMerchantController(MerchantUseCase)
 
-	authUsecase := usecase.NewAuthUsecase(MerchantRepository)
-	authController := controller.NewAuthController(authUsecase)
-
-
 	server.GET("/merchants", MerchantController.GetMerchants)
 	server.GET("/merchant/:merchantId", MerchantController.GetMerchantByID)
 	server.POST("/merchant", MerchantController.CreateMerchant)
 	server.DELETE("/merchant/delete/:merchantId", MerchantController.DeleteMerchant)
-	server.POST("/login", authController.Login)
-}
 
+}

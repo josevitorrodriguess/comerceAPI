@@ -16,7 +16,11 @@ func NewProductUseCase(repo repository.ProductRepository) ProductUsecase {
 }
 
 func (pu *ProductUsecase) GetProducts() ([]model.Product, error){
-	return pu.repository.GetProducts()
+	products, err := pu.repository.GetProducts()
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
 }
 
 func (pu *ProductUsecase) CreateProduct(product model.Product) (model.Product, error) {

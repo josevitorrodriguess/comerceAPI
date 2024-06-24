@@ -19,7 +19,7 @@ func NewMerchantRepository(conn *sql.DB) MerchantRepository {
 	}
 }
 
-func ( mr *MerchantRepository) GetMerchants() ([]model.Merchant, error) {
+func (mr *MerchantRepository) GetMerchants() ([]model.Merchant, error) {
 	query := "SELECT id_merchant, name, product_type, email FROM merchant"
 	rows, err := mr.connection.Query(query)
 	if err != nil {

@@ -22,13 +22,17 @@ func NewProductController(usecase usecase.ProductUsecase) productController {
 }
 
 func (p *productController) GetProducts(ctx *gin.Context) {
-
+   
 	products, err := p.productUseCase.GetProducts()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-	}
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to retrieve products",
+            "details": err.Error(),
+        })
+        return
+    }
 
-	ctx.JSON(http.StatusOK, products)
+    ctx.JSON(http.StatusOK, products)
 }
 
 func (p *productController) CreateProduct(ctx *gin.Context) {
