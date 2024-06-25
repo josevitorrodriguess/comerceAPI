@@ -11,15 +11,10 @@ This API project provides functionalities for managing products, clients, and me
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [ER Diagram](#er-diagram)
-3. [Directory Structure](#directory-structure)
-4. [Dependencies](#dependencies)
-5. [Usage Instructions](#usage-instructions)
-6. [Additional Notes](#additional-notes)
-7. [Endpoints](#endpoints)
-   - [Authentication](#authentication)
-     - [Client Login](#client-login)
-     - [Merchant Login](#merchant-login)
+2. [Dependencies](#dependencies)
+3. [Usage Instructions](#usage-instructions)
+4. [Additional Notes](#additional-notes)
+
 
 ## Overview
 
