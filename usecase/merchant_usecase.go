@@ -41,6 +41,15 @@ func (mu *MerchantUsecase) CreateMerchant(merchant model.Merchant) (model.Mercha
 		return model.Merchant{}, fmt.Errorf("invalid email format: %s", merchant.Email)
 	}
 
+	isValidCNPJ, err := services.ValidateCNPJ(merchant.CNPJ)
+	if err != nil {
+		return model.Merchant{}, fmt.Errorf("failed to validate CNPJ %v", merchant.CNPJ)
+	}
+	if !isValidCNPJ {
+		return model.Merchant{}, fmt.Errorf("invalid cnpj format: %s", merchant.CNPJ)
+	}
+	
+
 	merchantId, err := mu.repository.CreateMerchant(merchant)
 	if err != nil {
 		return model.Merchant{}, err
@@ -49,12 +58,12 @@ func (mu *MerchantUsecase) CreateMerchant(merchant model.Merchant) (model.Mercha
 	merchant.Password = services.SHA256Encoder(merchant.Password)
 	merchant.ID = merchantId
 
-	email := model.Email {
+	email := model.Email{
 		Subject: "Welcome! Your account was created",
-		Body: "Your account sucessfull created.",
+		Body:    "Your account sucessfull created.",
 	}
 
-	services.SendMail(merchant.Email,email)
+	services.SendMail(merchant.Email, email)
 
 	return merchant, nil
 }

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/josevitorrodriguess/productsAPI/db"
-	"github.com/josevitorrodriguess/productsAPI/routes"
+"github.com/gin-gonic/gin"
+"github.com/josevitorrodriguess/productsAPI/db"
+"github.com/josevitorrodriguess/productsAPI/routes"
 )
 
 func main() {

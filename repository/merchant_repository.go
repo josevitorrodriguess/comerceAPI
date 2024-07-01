@@ -22,10 +22,11 @@ func NewMerchantRepository(conn *sql.DB) MerchantRepository {
 
 func (mr *MerchantRepository) GetMerchants() ([]model.Merchant, error) {
 	query := `
-        SELECT m.id_merchant, m.name, m.product_type, m.email, COALESCE(GROUP_CONCAT(p.product_name SEPARATOR ', '), '') AS products
-        FROM merchant m
-        LEFT JOIN product p ON m.id_merchant = p.merchant_id
-        GROUP BY m.id_merchant
+        SELECT m.id_merchant, m.name, m.product_type, m.email, m.cnpj, 
+		COALESCE(GROUP_CONCAT(p.product_name SEPARATOR ', '), '') AS products 
+		FROM merchant m 
+		LEFT JOIN product p ON m.id_merchant = p.merchant_id 
+		GROUP BY m.id_merchant;
     `
 
 	rows, err := mr.connection.Query(query)
@@ -47,6 +48,7 @@ func (mr *MerchantRepository) GetMerchants() ([]model.Merchant, error) {
 			&merchantObj.Name,
 			&merchantObj.TypeProduct,
 			&merchantObj.Email,
+			&merchantObj.CNPJ,
 			&products,
 		)
 		if err != nil {
@@ -69,20 +71,11 @@ func (mr *MerchantRepository) GetMerchants() ([]model.Merchant, error) {
 func (mr *MerchantRepository) GetMerchantByID(merchant_id int) (*model.Merchant, error) {
 
 	query := `
-        SELECT 
-            m.id_merchant, 
-            m.name, 
-            m.product_type, 
-            m.email, 
-            COALESCE(GROUP_CONCAT(p.product_name SEPARATOR ', '), '') AS products
-        FROM 
-            merchant m
-        LEFT JOIN 
-            product p ON m.id_merchant = p.merchant_id
-        WHERE 
-            m.id_merchant = ?
-        GROUP BY 
-            m.id_merchant;
+        SELECT m.id_merchant, m.name, m.product_type, m.email, m.cnpj, COALESCE(GROUP_CONCAT(p.product_name SEPARATOR ', '), '') AS products 
+		FROM merchant m 
+		LEFT JOIN product p ON m.id_merchant = p.merchant_id 
+		WHERE m.id_merchant = ? 
+		GROUP BY m.id_merchant;
     `
 	row := mr.connection.QueryRow(query, merchant_id)
 
@@ -93,6 +86,7 @@ func (mr *MerchantRepository) GetMerchantByID(merchant_id int) (*model.Merchant,
 		&merchant.Name,
 		&merchant.TypeProduct,
 		&merchant.Email,
+		&merchant.CNPJ,
 		&products,
 	)
 	if err != nil {
@@ -115,14 +109,14 @@ func (mr *MerchantRepository) GetMerchantByID(merchant_id int) (*model.Merchant,
 func (mr *MerchantRepository) CreateMerchant(merchant model.Merchant) (int, error) {
 	var id int64
 
-	query, err := mr.connection.Prepare("INSERT INTO merchant (name, product_type, email, password) VALUES (?, ?, ?, ?)")
+	query, err := mr.connection.Prepare("INSERT INTO merchant (name, product_type, email, password, cnpj) VALUES (?, ?, ?, ?, ?)")
 	if err != nil {
 		return 0, fmt.Errorf("failed to prepare query: %v", err)
 	}
 
 	defer query.Close()
 
-	result, err := query.Exec(merchant.Name, merchant.TypeProduct, merchant.Email, services.SHA256Encoder(merchant.Password))
+	result, err := query.Exec(merchant.Name, merchant.TypeProduct, merchant.Email, services.SHA256Encoder(merchant.Password), merchant.CNPJ)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
