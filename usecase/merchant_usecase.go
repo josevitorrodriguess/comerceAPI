@@ -19,9 +19,8 @@ func NewMerchantUsecase(repo repository.MerchantRepository) MerchantUsecase {
 }
 
 func (mu *MerchantUsecase) GetMerchants() ([]model.Merchant, error) {
-    return mu.repository.GetMerchants()
+	return mu.repository.GetMerchants()
 }
-
 
 func (mu *MerchantUsecase) GetMerchantById(id_merchant int) (*model.Merchant, error) {
 	merchant, err := mu.repository.GetMerchantByID(id_merchant)
@@ -49,6 +48,13 @@ func (mu *MerchantUsecase) CreateMerchant(merchant model.Merchant) (model.Mercha
 
 	merchant.Password = services.SHA256Encoder(merchant.Password)
 	merchant.ID = merchantId
+
+	email := model.Email {
+		Subject: "Welcome! Your account was created",
+		Body: "Your account sucessfull created.",
+	}
+
+	services.SendMail(merchant.Email,email)
 
 	return merchant, nil
 }

@@ -27,3 +27,4 @@ func ValidateCPF(CPF string) (bool, error) {
 	}
 	return match, nil
 }
+

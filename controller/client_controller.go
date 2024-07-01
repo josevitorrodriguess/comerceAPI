@@ -19,29 +19,31 @@ func NewClientController(usecase usecase.ClientUsecase) clientController {
 	}
 }
 
+
 func (c *clientController) GetClients(ctx *gin.Context) {
 	clients, err := c.clientUsecase.GetClients()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
+		return
 	}
-
 	ctx.JSON(http.StatusOK, clients)
 }
 
-func (c *clientController) GetClientByID(ctx *gin.Context) {
 
+func (c *clientController) GetClientByID(ctx *gin.Context) {
 	id := ctx.Param("clientId")
 	if id == "" {
 		response := model.Response{
-			Message: "client ID cannote be null",
+			Message: "client ID cannot be null",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	clientId, err := strconv.Atoi(id)
 	if err != nil {
 		response := model.Response{
-			Message: "client Id must be a number",
+			Message: "client ID must be a number",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
 		return
@@ -64,6 +66,7 @@ func (c *clientController) GetClientByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, client)
 }
 
+
 func (c *clientController) CreateClient(ctx *gin.Context) {
 	var client model.Client
 	err := ctx.BindJSON(&client)
@@ -81,10 +84,7 @@ func (c *clientController) CreateClient(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, insertedClient)
 }
 
-
-
 func (c *clientController) DeleteClient(ctx *gin.Context) {
-
 	id := ctx.Param("clientId")
 	if id == "" {
 		response := model.Response{
@@ -97,7 +97,7 @@ func (c *clientController) DeleteClient(ctx *gin.Context) {
 	clientId, err := strconv.Atoi(id)
 	if err != nil {
 		response := model.Response{
-			Message: "client Id must be a number",
+			Message: "client ID must be a number",
 		}
 		ctx.JSON(http.StatusBadRequest, response)
 		return
@@ -115,4 +115,3 @@ func (c *clientController) DeleteClient(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response)
 }
-

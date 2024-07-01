@@ -58,9 +58,15 @@ func (cu *ClientUsecase) CreateClient(client model.Client) (model.Client, error)
 	if err != nil {
 		return model.Client{}, fmt.Errorf("failed to create client in repository: %v", err)
 	}
-
 	
 	client.ID = clientID
+
+	email := model.Email {
+		Subject: "Welcome! Your account was created",
+		Body: "Your account sucessfull created.",
+	}
+
+	services.SendMail(client.Email,email)
 
 	return client, nil
 }
